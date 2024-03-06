@@ -117,15 +117,16 @@ pub struct InitializeExtraAccountMetaList<'info> {
   pub extra_account_meta_list: AccountInfo<'info>,
   pub mint: InterfaceAccount<'info, Mint>,
   pub token_program: Interface<'info, TokenInterface>,
-  pub associated_token_program: Program<'info, AssociatedToken>,
   pub system_program: Program<'info, System>,
-  // #[account(init, payer = payer, space = 16)]
+
   #[account(init, payer = payer, mint::decimals = 0, mint::authority = mint_authority)]
   pub crumb_mint: InterfaceAccount<'info, Mint>,
-  /// CHECK: mint authority Account,
+
+  /// CHECK: mint authority Account for crumb mint
   #[account(seeds = [b"mint-authority"], bump)]
   pub mint_authority: UncheckedAccount<'info>,
-  /// CHECK: ATA,
+
+  /// CHECK: ATA Account for crumb mint
   pub crumb_mint_ata: UncheckedAccount<'info>,
 }
 
@@ -140,7 +141,7 @@ pub struct TransferHook<'info> {
   pub mint: InterfaceAccount<'info, Mint>,
   #[account(token::mint = mint)]
   pub destination_token: InterfaceAccount<'info, TokenAccount>,
-  /// CHECK: source token account owner, can be SystemAccount or PDA owned by another program
+  /// CHECK: source token account owner
   pub owner: UncheckedAccount<'info>,
 
   /// CHECK: ExtraAccountMetaList Account,
