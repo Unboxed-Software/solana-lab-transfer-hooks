@@ -21,7 +21,7 @@ import {
 } from '@solana/spl-token';
 import { createInitializeInstruction, pack } from '@solana/spl-token-metadata';
 import { expect } from 'chai';
-import { getMetadataObject } from '../helpers/helpers';
+import { airdropSolIfNeeded, getMetadataObject } from '../helpers/helpers';
 
 describe('transfer-hook', () => {
   // Configure the client to use the local cluster.
@@ -33,6 +33,10 @@ describe('transfer-hook', () => {
   const wallet = provider.wallet as anchor.Wallet;
 
   const connection = provider.connection;
+
+  before('Airdrop SOL', async () => {
+    await airdropSolIfNeeded(wallet.payer, provider.connection);
+  });
 
   it('Create NFT Account with Transfer Hook Extension', async () => {});
 

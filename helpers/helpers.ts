@@ -1,18 +1,17 @@
 import fs from 'fs';
 import * as web3 from '@solana/web3.js';
 import dotenv from 'dotenv';
-import { getKeypairFromFile } from '@solana-developers/helpers';
 import { TokenMetadata } from '@solana/spl-token-metadata';
 import { bundlrStorage, keypairIdentity, Metaplex, toMetaplexFile } from '@metaplex-foundation/js';
 dotenv.config();
 
-async function airdropSolIfNeeded(signer: web3.Keypair, connection: web3.Connection) {
+export async function airdropSolIfNeeded(signer: web3.Keypair, connection: web3.Connection) {
   const balance = await connection.getBalance(signer.publicKey);
   console.log('Current balance is', balance / web3.LAMPORTS_PER_SOL);
 
   if (balance < web3.LAMPORTS_PER_SOL) {
-    console.log('Airdropping 1 SOL...');
-    const airdropSignature = await connection.requestAirdrop(signer.publicKey, web3.LAMPORTS_PER_SOL);
+    console.log('Airdropping 2 SOL...');
+    const airdropSignature = await connection.requestAirdrop(signer.publicKey, web3.LAMPORTS_PER_SOL * 2);
 
     const latestBlockHash = await connection.getLatestBlockhash();
 
@@ -27,32 +26,6 @@ async function airdropSolIfNeeded(signer: web3.Keypair, connection: web3.Connect
   }
 }
 
-export async function initializeKeypair(connection: web3.Connection, keyPairFilePath?: string): Promise<web3.Keypair> {
-  if (keyPairFilePath) {
-    const signer = await getKeypairFromFile(keyPairFilePath);
-
-    await airdropSolIfNeeded(signer, connection);
-
-    return signer;
-  } else if (process.env.PRIVATE_KEY) {
-    const secret = JSON.parse(process.env.PRIVATE_KEY ?? '') as number[];
-    const secretKey = Uint8Array.from(secret);
-    const keypairFromSecretKey = web3.Keypair.fromSecretKey(secretKey);
-
-    await airdropSolIfNeeded(keypairFromSecretKey, connection);
-
-    return keypairFromSecretKey;
-  } else {
-    console.log('Creating .env file');
-
-    const signer = web3.Keypair.generate();
-    fs.writeFileSync('.env', `PRIVATE_KEY=[${signer.secretKey.toString()}]`);
-    await airdropSolIfNeeded(signer, connection);
-
-    return signer;
-  }
-}
-
 export interface UploadOffChainMetadataInputs {
   connection: web3.Connection;
   payer: web3.Keypair;
@@ -62,7 +35,7 @@ export interface UploadOffChainMetadataInputs {
   imagePath: string;
 }
 
-export async function uploadOffChainMetadata(inputs: UploadOffChainMetadataInputs) {
+async function uploadOffChainMetadata(inputs: UploadOffChainMetadataInputs) {
   const { connection, payer, tokenName, tokenDescription, tokenSymbol, imagePath } = inputs;
 
   // We are using metaplex API's to upload our metadata and images
