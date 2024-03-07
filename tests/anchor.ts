@@ -38,11 +38,11 @@ describe('transfer-hook', () => {
     await airdropSolIfNeeded(wallet.payer, provider.connection);
   });
 
-  it('Create NFT Account with Transfer Hook Extension', async () => {});
+  it('Creates an NFT with Transfer Hook Extension and Metadata', async () => {});
 
-  it('Create Token Accounts and Mint Tokens', async () => {});
+  it('Creates Token Accounts and Mint The NFT', async () => {});
 
-  it('Create ExtraAccountMetaList Account', async () => {});
+  it('Initializes ExtraAccountMetaList Account and Creates the ATA for the Crumb Mint', async () => {});
 
-  it('Transfer Hook with Extra Account Meta', async () => {});
+  it('Transfers the NFT and the transfer hook mints a crumb token for each transfer', async () => {});
 });
