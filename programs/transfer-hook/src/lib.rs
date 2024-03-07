@@ -1,7 +1,12 @@
 use anchor_lang::{ prelude::*, system_program::{ create_account, CreateAccount } };
-use anchor_spl::{ token_2022, token, associated_token::AssociatedToken, token_interface::{ Mint, TokenAccount, TokenInterface }};
+use anchor_spl::{
+  token_2022,
+  token,
+  associated_token::AssociatedToken,
+  token_interface::{ Mint, TokenAccount, TokenInterface },
+};
 use spl_transfer_hook_interface::instruction::{ ExecuteInstruction, TransferHookInstruction };
-use spl_tlv_account_resolution::{account::ExtraAccountMeta, seeds::Seed, state::ExtraAccountMetaList};
+use spl_tlv_account_resolution::{ account::ExtraAccountMeta, seeds::Seed, state::ExtraAccountMetaList };
 
 declare_id!("5FYsLEZ2vjDHmrs2UAVfDozy45zyPec26pjYvvgMiWhX");
 
@@ -21,7 +26,7 @@ pub mod transfer_hook {
       // index 6, associated token program
       ExtraAccountMeta::new_with_pubkey(&anchor_spl::associated_token::ID, false, false)?,
       // index 7, crumb mint
-      ExtraAccountMeta::new_with_pubkey(&ctx.accounts.crumb_mint.key(), false, true)?,
+      ExtraAccountMeta::new_with_pubkey(&ctx.accounts.crumb_mint.key(), false, true)?, // is_writable true
       // index 8, mint authority
       ExtraAccountMeta::new_with_seeds(
         &[
@@ -30,10 +35,10 @@ pub mod transfer_hook {
           },
         ],
         false, // is_signer
-        true // is_writable
+        false // is_writable
       )?,
       // index 9, ATA
-      ExtraAccountMeta::new_with_pubkey(&ctx.accounts.crumb_mint_ata.key(), false, true)?
+      ExtraAccountMeta::new_with_pubkey(&ctx.accounts.crumb_mint_ata.key(), false, true)? // is_writable true
     ];
 
     // calculate account size
@@ -66,7 +71,7 @@ pub mod transfer_hook {
 
   pub fn transfer_hook(ctx: Context<TransferHook>, _amount: u64) -> Result<()> {
     let signer_seeds: &[&[&[u8]]] = &[&[b"mint-authority", &[ctx.bumps.mint_authority]]];
-   // mint a crumb token for each transaction
+    // mint a crumb token for each transaction
     mint_to(
       CpiContext::new_with_signer(
         ctx.accounts.token_program.to_account_info(),
