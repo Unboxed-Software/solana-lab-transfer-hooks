@@ -1,8 +1,6 @@
 use anchor_lang::{ prelude::*, system_program::{ create_account, CreateAccount } };
 use anchor_spl::{
-  token_2022,
   token,
-  associated_token::AssociatedToken,
   token_interface::{ Mint, TokenAccount, TokenInterface },
 };
 use spl_transfer_hook_interface::instruction::{ ExecuteInstruction, TransferHookInstruction };
@@ -19,15 +17,11 @@ pub mod transfer_hook {
   pub fn initialize_extra_account_meta_list(ctx: Context<InitializeExtraAccountMetaList>) -> Result<()> {
     // index 0-3 are the accounts required for token transfer (source, mint, destination, owner)
     let account_metas = vec![
-      // index 4, Token 22 program
-      ExtraAccountMeta::new_with_pubkey(&token_2022::ID, false, false)?,
-      // index 5, Token program
+      // index 4, Token program
       ExtraAccountMeta::new_with_pubkey(&token::ID, false, false)?,
-      // index 6, associated token program
-      ExtraAccountMeta::new_with_pubkey(&anchor_spl::associated_token::ID, false, false)?,
-      // index 7, crumb mint
+      // index 5, crumb mint
       ExtraAccountMeta::new_with_pubkey(&ctx.accounts.crumb_mint.key(), false, true)?, // is_writable true
-      // index 8, mint authority
+      // index 6, mint authority
       ExtraAccountMeta::new_with_seeds(
         &[
           Seed::Literal {
@@ -37,7 +31,7 @@ pub mod transfer_hook {
         false, // is_signer
         false // is_writable
       )?,
-      // index 9, ATA
+      // index 7, ATA
       ExtraAccountMeta::new_with_pubkey(&ctx.accounts.crumb_mint_ata.key(), false, true)? // is_writable true
     ];
 
@@ -153,11 +147,7 @@ pub struct TransferHook<'info> {
   #[account(seeds = [b"extra-account-metas", mint.key().as_ref()], bump)]
   pub extra_account_meta_list: UncheckedAccount<'info>,
 
-  pub token_extension_program: Interface<'info, TokenInterface>,
-
   pub token_program: Interface<'info, TokenInterface>,
-
-  pub associated_token_program: Program<'info, AssociatedToken>,
 
   pub crumb_mint: InterfaceAccount<'info, Mint>,
 
