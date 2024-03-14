@@ -10,8 +10,6 @@ declare_id!("5FYsLEZ2vjDHmrs2UAVfDozy45zyPec26pjYvvgMiWhX");
 
 #[program]
 pub mod transfer_hook {
-  use anchor_spl::token::mint_to;
-
   use super::*;
 
   pub fn initialize_extra_account_meta_list(ctx: Context<InitializeExtraAccountMetaList>) -> Result<()> {
@@ -43,7 +41,7 @@ pub mod transfer_hook {
     let mint = ctx.accounts.mint.key();
     let signer_seeds: &[&[&[u8]]] = &[&[b"extra-account-metas", &mint.as_ref(), &[ctx.bumps.extra_account_meta_list]]];
 
-    // create ExtraAccountMetaList account
+    // Create ExtraAccountMetaList account
     create_account(
       CpiContext::new(ctx.accounts.system_program.to_account_info(), CreateAccount {
         from: ctx.accounts.payer.to_account_info(),
@@ -54,7 +52,7 @@ pub mod transfer_hook {
       ctx.program_id
     )?;
 
-    // initialize ExtraAccountMetaList account with extra accounts
+    // Initialize the account data to store the list of ExtraAccountMetas
     ExtraAccountMetaList::init::<ExecuteInstruction>(
       &mut ctx.accounts.extra_account_meta_list.try_borrow_mut_data()?,
       &account_metas
@@ -66,7 +64,7 @@ pub mod transfer_hook {
   pub fn transfer_hook(ctx: Context<TransferHook>, _amount: u64) -> Result<()> {
     let signer_seeds: &[&[&[u8]]] = &[&[b"mint-authority", &[ctx.bumps.mint_authority]]];
     // mint a crumb token for each transaction
-    mint_to(
+    token::mint_to(
       CpiContext::new_with_signer(
         ctx.accounts.token_program.to_account_info(),
         token::MintTo {
@@ -132,7 +130,7 @@ pub struct InitializeExtraAccountMetaList<'info> {
 // Order of accounts matters for this struct.
 // The first 4 accounts are the accounts required for token transfer (source, mint, destination, owner)
 // Remaining accounts are the extra accounts required from the ExtraAccountMetaList account
-// These accounts are provided via CPI to this program from the token2022 program
+// These accounts are provided via CPI to this program from the Token Extension program
 #[derive(Accounts)]
 pub struct TransferHook<'info> {
   #[account(token::mint = mint, token::authority = owner)]
