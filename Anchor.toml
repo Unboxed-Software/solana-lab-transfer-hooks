@@ -3,7 +3,7 @@ seeds = true
 skip-lint = false
 
 [programs.localnet]
-transfer_hook = "YOUR PROGRAM ID HERE"
+transfer_hook = "5FYsLEZ2vjDHmrs2UAVfDozy45zyPec26pjYvvgMiWhX"
 
 [registry]
 url = "https://api.apr.dev"
