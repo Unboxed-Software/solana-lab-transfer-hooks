@@ -1,7 +1,7 @@
 use anchor_lang::{ prelude::*, system_program::{ create_account, CreateAccount } };
-use anchor_spl::{ token_2022, token, associated_token::AssociatedToken, token_interface::{ Mint, TokenAccount, TokenInterface }};
+use anchor_spl::{ token, token_interface::{ Mint, TokenAccount, TokenInterface } };
 use spl_transfer_hook_interface::instruction::{ ExecuteInstruction, TransferHookInstruction };
-use spl_tlv_account_resolution::{account::ExtraAccountMeta, seeds::Seed, state::ExtraAccountMetaList};
+use spl_tlv_account_resolution::{ account::ExtraAccountMeta, seeds::Seed, state::ExtraAccountMetaList };
 
 declare_id!("YOUR PROGRAM ID HERE");
 
