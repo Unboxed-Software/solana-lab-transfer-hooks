@@ -1,5 +1,6 @@
 use anchor_lang::{ prelude::*, system_program::{ create_account, CreateAccount } };
 use anchor_spl::{
+  associated_token::{ AssociatedToken, ID as associated_token_id },
   token,
   token_interface::{ Mint, TokenAccount, TokenInterface },
 };
@@ -18,9 +19,11 @@ pub mod transfer_hook {
     let account_metas = vec![
       // index 5, Token program
       ExtraAccountMeta::new_with_pubkey(&token::ID, false, false)?,
-      // index 6, crumb mint
+      // index 6, Associated Token program
+      ExtraAccountMeta::new_with_pubkey(&associated_token_id, false, false)?,
+      // index 7, crumb mint
       ExtraAccountMeta::new_with_pubkey(&ctx.accounts.crumb_mint.key(), false, true)?, // is_writable true
-      // index 7, mint authority
+      // index 8, mint authority
       ExtraAccountMeta::new_with_seeds(
         &[
           Seed::Literal {
@@ -30,8 +33,17 @@ pub mod transfer_hook {
         false, // is_signer
         false // is_writable
       )?,
-      // index 8, ATA
-      ExtraAccountMeta::new_with_pubkey(&ctx.accounts.crumb_mint_ata.key(), false, true)? // is_writable true
+      // index 9, crumb mint ATA
+      ExtraAccountMeta::new_external_pda_with_seeds(
+        6, // associated token program index
+        &[
+          Seed::AccountKey { index: 8 }, // owner index
+          Seed::AccountKey { index: 5 }, // token program index
+          Seed::AccountKey { index: 7 }, // crumb mint index
+        ],
+        false, // is_signer
+        true // is_writable
+      )?
     ];
 
     // calculate account size
@@ -117,15 +129,17 @@ pub struct InitializeExtraAccountMetaList<'info> {
   pub token_program: Interface<'info, TokenInterface>,
   pub system_program: Program<'info, System>,
 
-  #[account(init, payer = payer, mint::decimals = 0, mint::authority = mint_authority)]
+  #[account(
+    init,
+    payer = payer,
+    mint::decimals = 0,
+    mint::authority = mint_authority,
+  )]
   pub crumb_mint: InterfaceAccount<'info, Mint>,
 
   /// CHECK: mint authority Account for crumb mint
   #[account(seeds = [b"mint-authority"], bump)]
   pub mint_authority: UncheckedAccount<'info>,
-
-  /// CHECK: ATA Account for crumb mint
-  pub crumb_mint_ata: UncheckedAccount<'info>,
 }
 
 // Order of accounts matters for this struct.
@@ -148,12 +162,16 @@ pub struct TransferHook<'info> {
 
   pub token_program: Interface<'info, TokenInterface>,
 
+  pub associated_token_program: Program<'info, AssociatedToken>,
+
   pub crumb_mint: InterfaceAccount<'info, Mint>,
 
   /// CHECK: mint authority Account,
   #[account(seeds = [b"mint-authority"], bump)]
   pub mint_authority: UncheckedAccount<'info>,
 
-  #[account(token::mint = crumb_mint)]
+  #[account(
+    token::mint = crumb_mint, 
+)]
   pub crumb_mint_ata: InterfaceAccount<'info, TokenAccount>,
 }

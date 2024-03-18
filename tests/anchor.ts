@@ -186,7 +186,6 @@ describe('transfer-hook', () => {
         mint: mint.publicKey,
         extraAccountMetaList: extraAccountMetaListPDA,
         crumbMint: crumbMint.publicKey,
-        crumbMintAta: crumbMintATA,
       })
       .instruction();
 
