@@ -14,12 +14,13 @@ pub mod transfer_hook {
 
   pub fn initialize_extra_account_meta_list(ctx: Context<InitializeExtraAccountMetaList>) -> Result<()> {
     // index 0-3 are the accounts required for token transfer (source, mint, destination, owner)
+    // index 4 is the extra_account_meta_list account
     let account_metas = vec![
-      // index 4, Token program
+      // index 5, Token program
       ExtraAccountMeta::new_with_pubkey(&token::ID, false, false)?,
-      // index 5, crumb mint
+      // index 6, crumb mint
       ExtraAccountMeta::new_with_pubkey(&ctx.accounts.crumb_mint.key(), false, true)?, // is_writable true
-      // index 6, mint authority
+      // index 7, mint authority
       ExtraAccountMeta::new_with_seeds(
         &[
           Seed::Literal {
@@ -29,7 +30,7 @@ pub mod transfer_hook {
         false, // is_signer
         false // is_writable
       )?,
-      // index 7, ATA
+      // index 8, ATA
       ExtraAccountMeta::new_with_pubkey(&ctx.accounts.crumb_mint_ata.key(), false, true)? // is_writable true
     ];
 
