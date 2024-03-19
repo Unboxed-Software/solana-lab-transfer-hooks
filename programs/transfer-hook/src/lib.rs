@@ -3,7 +3,7 @@ use anchor_spl::{ token, token_interface::{ Mint, TokenAccount, TokenInterface }
 use spl_transfer_hook_interface::instruction::{ ExecuteInstruction, TransferHookInstruction };
 use spl_tlv_account_resolution::{ account::ExtraAccountMeta, seeds::Seed, state::ExtraAccountMetaList };
 
-declare_id!("YOUR PROGRAM ID HERE");
+declare_id!("YOUR_PROGRAM_ID_HERE");
 
 #[program]
 pub mod transfer_hook {
